@@ -1,19 +1,20 @@
 module Views exposing (view)
 
+import Http exposing (..)
 import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (placeholder, class)
-
 import Models exposing (Model, DominoAppMessage(..), Actor)
 
 
 view : Model -> Html DominoAppMessage
 view model =
     div []
-        (   [ renderHeader ]
+        ([ renderHeader ]
             ++ (renderErrorMessage model.errorMessage)
             ++ [ (renderSearchField model) ]
             ++ [ renderActorsListView model.actors ]
+            ++ [ renderDebugButtons ]
         )
 
 
@@ -66,3 +67,32 @@ renderActorsListView maybeActors =
 renderActorView : Actor -> Html DominoAppMessage
 renderActorView actor =
     button [ class "list-group-item" ] [ text actor.name ]
+
+
+renderDebugButtons : Html DominoAppMessage
+renderDebugButtons =
+    div []
+        [ span [] [ text "Error testing: " ]
+        , div [ class "btn-group" ]
+            [ button
+                [ onClick (SearchFailed Timeout)
+                , class "btn btn-danger"
+                ]
+                [ text "Timeout" ]
+            , button
+                [ onClick (SearchFailed NetworkError)
+                , class "btn btn-danger"
+                ]
+                [ text "Network Error" ]
+            , button
+                [ onClick (SearchFailed (UnexpectedPayload "Text of the error"))
+                , class "btn btn-danger"
+                ]
+                [ text "Unexpected Payload" ]
+            , button
+                [ onClick (SearchFailed (BadResponse 404 "Not found"))
+                , class "btn btn-danger"
+                ]
+                [ text "Bad Response" ]
+            ]
+        ]
