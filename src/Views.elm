@@ -4,18 +4,33 @@ import Http exposing (..)
 import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (placeholder, class)
-import Models exposing (Model, DominoAppMessage(..), Actor)
+import Models exposing (Model, DominoAppMessage(..), Actor, Status(..))
 
 
 view : Model -> Html DominoAppMessage
 view model =
     div []
         ([ renderHeader ]
-            ++ (renderErrorMessage model.errorMessage)
-            ++ [ (renderSearchField model) ]
-            ++ [ renderActorsListView model.actors ]
+            ++ [ renderSearchField model ]
+            ++ [ renderMain model ]
             ++ [ renderDebugButtons ]
         )
+
+
+renderMain : Model -> Html DominoAppMessage
+renderMain model =
+    case model.status of
+        Initial ->
+            div [] [ text "Type name then click Search" ]
+
+        InProgress ->
+            div [] [ text "Search pending…" ]
+
+        Loaded ->
+            renderActorsListView model.actors
+
+        Error ->
+            div [] (renderErrorMessage model.errorMessage)
 
 
 renderErrorMessage : Maybe String -> List (Html DominoAppMessage)

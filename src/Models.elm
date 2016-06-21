@@ -9,10 +9,18 @@ type alias Actor =
     }
 
 
+type Status
+    = Initial
+    | InProgress
+    | Loaded
+    | Error
+
+
 type alias Model =
     { actorSearchFieldText : String
     , actors : Maybe (List Actor)
     , errorMessage : Maybe String
+    , status : Status
     }
 
 

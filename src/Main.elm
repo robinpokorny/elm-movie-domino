@@ -19,7 +19,7 @@ main =
 
 init : ( Model, Cmd DominoAppMessage )
 init =
-    ( Model "" Nothing Nothing
+    ( Model "" Nothing Nothing Initial
     , Cmd.none
     )
 
@@ -28,7 +28,13 @@ update : DominoAppMessage -> Model -> ( Model, Cmd DominoAppMessage )
 update msg model =
     case msg of
         SearchClicked ->
-            ( model, searchPerson model.actorSearchFieldText )
+            let
+                newModel =
+                    { model
+                        | status = InProgress
+                    }
+            in
+                ( newModel, searchPerson model.actorSearchFieldText )
 
         SearchSucceeded actorsList ->
             let
@@ -36,6 +42,7 @@ update msg model =
                     { model
                         | actors = Just actorsList
                         , errorMessage = Nothing
+                        , status = Loaded
                     }
             in
                 ( newModel, Cmd.none )
@@ -57,14 +64,20 @@ update msg model =
                             message
 
                 newModel =
-                    { model | errorMessage = Just errorMessage }
+                    { model
+                        | errorMessage = Just errorMessage
+                        , status = Error
+                    }
             in
                 ( newModel, Cmd.none )
 
         TextChanged newText ->
             let
                 newModel =
-                    { model | actorSearchFieldText = newText }
+                    { model
+                        | actorSearchFieldText = newText
+                        , status = Initial
+                    }
             in
                 ( newModel, Cmd.none )
 
