@@ -2,8 +2,8 @@ module Views exposing (view)
 
 import Http exposing (..)
 import Html exposing (..)
-import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (placeholder, class)
+import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Attributes exposing (placeholder, class, src, type')
 import Models exposing (Model, DominoAppMessage(..), Actor, Status(..))
 
 
@@ -45,21 +45,23 @@ renderErrorMessage maybeErrors =
 
 renderSearchField : Model -> Html DominoAppMessage
 renderSearchField model =
-    div [ class "input-group" ]
-        [ input
-            [ placeholder "e.g. Uma Thurman"
-            , onInput TextChanged
-            , class "form-control"
-            ]
-            [ text model.actorSearchFieldText ]
-        , span
-            [ class "input-group-btn"
-            ]
-            [ button
-                [ onClick SearchClicked
-                , class "btn btn-default"
+    form [ onSubmit SearchClicked ]
+        [ div [ class "input-group" ]
+            [ input
+                [ placeholder "e.g. Uma Thurman"
+                , onInput TextChanged
+                , class "form-control"
                 ]
-                [ text "Search" ]
+                [ text model.actorSearchFieldText ]
+            , span
+                [ class "input-group-btn"
+                ]
+                [ button
+                    [ type' "submit"
+                    , class "btn btn-default"
+                    ]
+                    [ text "Search" ]
+                ]
             ]
         ]
 
@@ -73,7 +75,7 @@ renderActorsListView : Maybe (List Actor) -> Html DominoAppMessage
 renderActorsListView maybeActors =
     case maybeActors of
         Nothing ->
-            text "Pending"
+            text "No results"
 
         Just actors ->
             div [ class "list-group" ] (List.map renderActorView actors)
@@ -81,7 +83,16 @@ renderActorsListView maybeActors =
 
 renderActorView : Actor -> Html DominoAppMessage
 renderActorView actor =
-    button [ class "list-group-item" ] [ text actor.name ]
+    button [ class "list-group-item" ]
+        [ case actor.image of
+            Just url ->
+                img [ src ("http://image.tmdb.org/t/p/w45" ++ url) ]
+                    []
+
+            _ ->
+                text ""
+        , text actor.name
+        ]
 
 
 renderDebugButtons : Html DominoAppMessage

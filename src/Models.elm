@@ -6,6 +6,7 @@ import Http
 type alias Actor =
     { name : String
     , id : Int
+    , image : Maybe String
     }
 
 
